@@ -1,90 +1,167 @@
-# NetSuite Academy
+## 🧠 Approach
 
-NetSuite Academy is a full-stack learning and course management platform designed to provide a centralized environment for creating courses, managing learners, conducting assessments, and issuing completion certificates.
+NetSuite Academy was developed as a full-stack learning management platform with a
+clear separation between the frontend, backend, and database layers.
 
-## 🚀 Features
+The development approach was:
 
-### Learner Portal
-- Learner authentication
-- View available published courses
-- View course information and passing score
-- Start and complete courses
-- Take course assessments
-- Track learning progress
-- View earned certificates
-- Download certificates as PDF
+1. Design the core learning workflow around users, courses, modules, quizzes,
+   progress, and certificates.
+2. Implement a REST API using FastAPI for business logic and data operations.
+3. Use PostgreSQL with SQLAlchemy ORM for persistent application data.
+4. Implement JWT authentication and role-based authorization.
+5. Build separate React interfaces for learners and administrators.
+6. Connect quizzes and learner progress to course completion.
+7. Generate downloadable PDF certificates for learners who meet the required
+   passing score.
+8. Provide administrators with dashboard statistics and management functionality.
 
-### Administration Portal
-- Admin authentication and authorization
-- Dashboard statistics
-- Course management
-- Publish and manage courses
-- Quiz management
-- Learner management
-- Certificate tracking
+The application was developed incrementally, with individual features tested through
+the API documentation and the frontend before integrating them into the complete
+learning workflow.
 
-### Authentication & Security
-- JWT-based authentication
-- Role-based access control
-- Admin and instructor authorization
-- Password hashing
-- Protected API endpoints
+---
 
-### Certificate Generation
-- Automatic certificate generation after successful completion
-- Unique certificate number
-- Final score displayed on certificate
-- Issue date
-- Downloadable PDF certificate
+## 🎮 How to Use
 
-## 🏗️ Technology Stack
+Once both the backend and frontend are running, open the frontend application in
+your browser.
 
-### Backend
-- Python
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- JWT Authentication
-- Passlib / bcrypt
-- ReportLab
+### 1. Login
 
-### Frontend
-- React
-- TypeScript
-- Vite
-- Axios
+The application provides role-based access.
 
-## 📁 Project Structure
+Users can log in using their registered email and password.
+
+Depending on the user's role, they are directed to the appropriate experience:
+
+- **Learner** → Learner Portal
+- **Instructor** → Instructor-level functionality
+- **Admin** → Administration Portal
+
+---
+
+### 2. Learner Workflow
+
+After logging in as a learner:
+
+#### 📚 Browse Courses
+
+The learner dashboard displays the courses currently available to learners.
+
+Each course provides:
+
+- Course title
+- Description
+- Category
+- Required passing score
+
+Click:
+Start Course →
+
+## ⚙️ Design Decisions
+
+### REST API Architecture
+
+FastAPI was selected to provide a lightweight, structured REST API between the
+React frontend and PostgreSQL database.
+
+This keeps the frontend independent from the backend implementation and makes the
+platform easier to extend in the future.
+
+### Role-Based Access
+
+The platform uses roles to separate responsibilities:
+
+- **Admin** — manages courses, quizzes, learners, and certificates.
+- **Instructor** — can perform instructor-level course operations.
+- **Learner** — consumes courses, completes assessments, and receives certificates.
+
+JWT authentication is used to protect authenticated endpoints.
+
+### Relational Database
+
+PostgreSQL was selected because the platform contains strongly related entities
+such as users, courses, modules, quizzes, learner progress, and certificates.
+
+SQLAlchemy provides the ORM layer between the FastAPI application and PostgreSQL.
+
+### Automated Certificates
+
+Certificate generation is integrated directly into the backend.
+
+When a learner satisfies the course completion requirements, the system creates a
+unique certificate record and generates a downloadable PDF using ReportLab.
+
+This avoids requiring administrators to manually create certificates.
+
+### Separate Learner and Administration Experiences
+
+The frontend provides different workflows for learners and administrators rather
+than attempting to expose every function through a single interface.
+
+This makes the application easier to understand and reduces the possibility of
+learners accessing administrative functionality.
+
+---
+
+## 📌 Assumptions
+
+The following assumptions were made during development:
+
+- A learner must be authenticated before accessing protected learning features.
+- Each course has a defined passing score.
+- Quiz/assessment performance is used to determine successful completion.
+- A certificate belongs to a specific learner and course.
+- Administrators are trusted users who can manage academy content.
+- PostgreSQL is available when running the application locally.
+- Certificate PDFs are generated by the backend rather than the browser.
+- The current implementation is intended as a functional hackathon prototype
+  that can be extended for production deployment.
+
+---
+
+## 🔄 End-to-End Learning Workflow
 
 ```text
-netsuite-academy/
-│
-├── netsuite-academy-backend/
-│   ├── app/
-│   │   ├── routers/
-│   │   │   ├── admin.py
-│   │   │   ├── auth.py
-│   │   │   ├── certificates.py
-│   │   │   ├── courses.py
-│   │   │   ├── learners.py
-│   │   │   ├── modules.py
-│   │   │   └── quizzes.py
-│   │   ├── auth.py
-│   │   ├── database.py
-│   │   ├── main.py
-│   │   ├── models.py
-│   │   └── schemas.py
-│   ├── requirements.txt
-│   └── test_fastapi.py
-│
-├── netsuite-academy-frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── .gitignore
-└── README.md
+Administrator
+     │
+     ▼
+Create Course
+     │
+     ▼
+Add Learning Content
+     │
+     ▼
+Create Assessment
+     │
+     ▼
+Publish Course
+     │
+     ▼
+Learner Enrols / Starts Course
+     │
+     ▼
+Completes Learning Content
+     │
+     ▼
+Takes Quiz
+     │
+     ▼
+Score Calculated
+     │
+     ▼
+Passing Score Achieved?
+     │
+   ┌─┴─┐
+   │   │
+  No  Yes
+   │   │
+   │   ▼
+   │ Certificate Generated
+   │   │
+   │   ▼
+   │ PDF Certificate
+   │
+   ▼
+Learner Continues Learning
